@@ -34,6 +34,18 @@ public class db_util extends SQLiteOpenHelper {
 
     private static final String[] COLUMNS = {KEY_ID,KEY_FULLNAME, KEY__ID, KEY_EMAIL, KEY_POINTS};
 
+    private static final String TABLE_MISSION = "mission";
+
+    // Books Table Columns names
+    private static final String KEY_M_ID = "mission_id";
+    private static final String KEY_M_LAT = "lat";
+    private static final String KEY_M_LON = "lon";
+    private static final String KEY_M_STATUS = "status";
+    private static final String KEY_M_POINTS = "pointsEarned";
+
+
+    private static final String[] COLUMNS_M = {KEY_M_ID, KEY_M_LAT, KEY_M_LON, KEY_M_STATUS, KEY_M_POINTS};
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         // SQL statement to create book table
@@ -65,6 +77,114 @@ public class db_util extends SQLiteOpenHelper {
         // create fresh books table
         this.onCreate(db);
     }
+
+    public void addMission(db_mission mission){
+        //for logging
+        Log.d("addBook", mission.toString());
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+
+        //KEY_M_ID, KEY_M_LAT, KEY_M_LON, KEY_M_STATUS, KEY_M_POINTS
+
+        values.put(KEY_M_LAT, mission.lat);
+        values.put(KEY_M_LON, mission.lon);
+        values.put(KEY_M_STATUS, mission.status);
+        values.put(KEY_M_POINTS, mission.pointsEarned);
+
+        // 3. insert
+        db.insert(TABLE_MISSION, // table
+                null, //nullColumnHack
+                values); // key/value -> keys = column names/ values = column values
+
+        // 4. close
+        db.close();
+    }
+
+    public db_mission getMission(int id){
+
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build query
+        Cursor cursor =
+                db.query(TABLE_MISSION, // a. table
+                        COLUMNS_M, // b. column names
+                        " mission_id = ?", // c. selections
+                        new String[] { String.valueOf(id) }, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        // 3. if we got results get the first one
+        if (cursor != null && cursor.getCount() > 1) {
+            cursor.moveToFirst();
+        } else {
+            return null;
+        }
+
+        //KEY_M_ID, KEY_M_LAT, KEY_M_LON, KEY_M_STATUS, KEY_M_POINTS
+
+        // 4. build book object
+        db_mission mission = new db_mission( Integer.parseInt(cursor.getString(0)), Float.parseFloat(cursor.getString(1)), Float.parseFloat(cursor.getString(2)), Boolean.parseBoolean(cursor.getString(3)), Integer.parseInt(cursor.getString(4)) );
+
+        //log
+        Log.d("getBook("+id+")", mission.toString());
+
+        // 5. return book
+        return mission;
+    }
+
+    public int updateMission(db_mission mission) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //KEY_M_ID, KEY_M_LAT, KEY_M_LON, KEY_M_STATUS, KEY_M_POINTS
+        // 2. create ContentValues to add key "column"/value
+        ContentValues values = new ContentValues();
+        values.put(KEY_M_POINTS, mission.pointsEarned); // get title
+        values.put(KEY_M_LAT, mission.lat); // get author
+        values.put(KEY_M_LON, mission.lon);
+        values.put(KEY_M_STATUS, mission.status);
+
+        // 3. updating row
+        int i = db.update(TABLE_MISSION, //table
+                values, // column/value
+                KEY_M_ID+" = ?", // selections
+                new String[] { String.valueOf(mission.mission_id) }); //selection args
+
+        // 4. close
+        db.close();
+
+        return i;
+
+    }
+
+    public void deleteMission(db_mission mission) {
+
+        // 1. get reference to writable DB
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // 2. delete
+        db.delete(TABLE_MISSION, //table name
+                KEY_M_ID+" = ?",  // selections
+                new String[] { String.valueOf(mission.mission_id) }); //selections args
+
+        // 3. close
+        db.close();
+
+        //log
+        Log.d("deleteBook", mission.toString());
+
+    }
+
+
+    /// CRUD USER
 
     public void addUser(db_user user){
         //for logging
@@ -110,7 +230,7 @@ public class db_util extends SQLiteOpenHelper {
                         null); // h. limit
 
         // 3. if we got results get the first one
-        if (cursor != null && cursor.getCount() > 0) {
+        if (cursor != null && cursor.getCount() > 1) {
             cursor.moveToFirst();
         } else {
             return null;

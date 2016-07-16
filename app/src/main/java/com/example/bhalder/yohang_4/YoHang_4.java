@@ -32,7 +32,7 @@ public class YoHang_4 extends Activity implements OnClickListener {
 
         switch(view.getId()) {
             case R.id.btnStartAnotherActivity:
-                Intent intent = new Intent(this, AnotherActivity.class);
+                Intent intent = new Intent(this, MyProfileActivity.class);
                 startActivity(intent);
                 break;
             case R.id.btnStartNewMission:

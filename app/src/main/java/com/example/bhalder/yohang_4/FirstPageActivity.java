@@ -152,6 +152,7 @@ public class FirstPageActivity extends AppCompatActivity implements View.OnClick
                         db_util db = new db_util(this.firstActivity);
                         db_user user = db.getUser(loginIdStr);
                         if( user == null ) {
+                            user = new db_user();
                             user.userId = loginIdStr;
                             user.points = 0;
                             user.email = "test@gmail.com";

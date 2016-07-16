@@ -35,7 +35,7 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(this, GetMissionActivity.class);
+        Intent intent = new Intent(this, MissionBriefActivity.class);
         startActivity(intent);
     }
 
